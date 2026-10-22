@@ -1,0 +1,629 @@
+<title>Hiew Tieng Shen Financial Planning</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600;700&display=swap">
+<style>
+/* Layout: a calm, ledger-like single page. Navy hero band with an at-a-glance sheet,
+   two-column services, a working protection-gap calculator beside a legacy checklist,
+   then process, about, FAQ and a WhatsApp-first contact block. Gold is the single accent. */
+:root{
+  --bg:#F4F6FA; --surface:#FFFFFF; --surface-2:#E9EEF6;
+  --ink:#101C34; --muted:#4A5873; --line:#D6DDE9;
+  --navy:#10234A; --navy-2:#1A3363;
+  --gold:#BE9530; --gold-ink:#7F6010; --on-gold:#101C34;
+  --band-fg:#F2F5FA; --band-muted:#B7C3DB; --band-line:#2F4776; --band-gold:#E2BB59; --band-surface:#162C58;
+  --bar:#1A3363; --gap:#B4472C; --ok:#2E7D5B;
+  --f-display:"Newsreader","Noto Serif SC",Georgia,"Songti SC","STSong",serif;
+  --f-body:"Albert Sans","Noto Sans SC",system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  --radius:10px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0A1328; --surface:#0F1D3B; --surface-2:#142549;
+    --ink:#EDF1F8; --muted:#A3AFC7; --line:#233861;
+    --navy:#122650; --navy-2:#1B3470;
+    --gold:#D4AB4A; --gold-ink:#E2BB59; --on-gold:#0E1A33;
+    --band-surface:#173062;
+    --bar:#7C9CE6; --gap:#E58A6B; --ok:#5CBE92;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0A1328; --surface:#0F1D3B; --surface-2:#142549;
+  --ink:#EDF1F8; --muted:#A3AFC7; --line:#233861;
+  --navy:#122650; --navy-2:#1B3470;
+  --gold:#D4AB4A; --gold-ink:#E2BB59; --on-gold:#0E1A33;
+  --band-surface:#173062;
+  --bar:#7C9CE6; --gap:#E58A6B; --ok:#5CBE92;
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:1rem;line-height:1.65;-webkit-text-size-adjust:100%}
+:root:not([data-lang]) .zh{display:none}
+html[data-lang="en"] .zh,html[data-lang="zh"] .en{display:none !important}
+h1,h2,h3{font-family:var(--f-display);font-weight:600;line-height:1.18;margin:0;text-wrap:balance;letter-spacing:-0.005em}
+html[data-lang="zh"] h1,html[data-lang="zh"] h2,html[data-lang="zh"] h3{letter-spacing:0;line-height:1.35;font-weight:700}
+p{margin:0}
+a{color:inherit}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pad{padding-block:clamp(48px,7vw,88px)}
+.eyebrow{font-size:.78rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-ink)}
+html[data-lang="zh"] .eyebrow{letter-spacing:.08em}
+.lede{color:var(--muted);max-width:62ch}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:4px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:46px;padding:.6rem 1.25rem;border-radius:8px;font:600 .95rem/1.2 var(--f-body);text-decoration:none;border:1.5px solid transparent;cursor:pointer;transition:transform .15s ease,background .15s ease}
+.btn:hover{transform:translateY(-1px)}
+.btn-gold{background:var(--gold);color:var(--on-gold)}
+.btn-gold:hover{background:var(--band-gold)}
+.btn-line{border-color:currentColor;background:transparent;color:inherit}
+.btn-ink{background:var(--navy);color:#F2F5FA}
+:root[data-theme="dark"] .btn-ink{background:var(--gold);color:var(--on-gold)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn-ink{background:var(--gold);color:var(--on-gold)}}
+
+/* header */
+.top{border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-block:14px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;min-width:0}
+.mark{flex:none;width:42px;height:42px;border-radius:8px;background:var(--navy);color:var(--band-gold);display:grid;place-items:center;font:600 .95rem/1 var(--f-display);letter-spacing:.04em}
+.brand-name{font:600 1.15rem/1.15 var(--f-display)}
+.brand-sub{display:block;font-size:.74rem;color:var(--muted);letter-spacing:.03em}
+.top-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.lang{display:inline-flex;border:1.5px solid var(--line);border-radius:8px;overflow:hidden}
+.lang button{appearance:none;border:0;background:transparent;color:var(--muted);font:600 .85rem/1 var(--f-body);padding:.7rem .95rem;cursor:pointer;min-height:42px}
+.lang button[aria-pressed="true"]{background:var(--navy);color:#F2F5FA}
+:root[data-theme="dark"] .lang button[aria-pressed="true"]{background:var(--gold);color:var(--on-gold)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .lang button[aria-pressed="true"]{background:var(--gold);color:var(--on-gold)}}
+.top .btn{min-height:42px;padding:.5rem 1rem;font-size:.88rem}
+
+/* hero */
+.hero{background:var(--navy);color:var(--band-fg)}
+.hero .wrap{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:clamp(28px,5vw,64px);align-items:center;padding-block:clamp(44px,7vw,84px)}
+.hero .eyebrow{color:var(--band-gold)}
+.hero h1{font-size:clamp(2.05rem,4.9vw,3.4rem);margin:.9rem 0 1.1rem}
+.hero .lede{color:var(--band-muted);font-size:1.06rem}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:1.8rem}
+.glance{background:var(--band-surface);border:1px solid var(--band-line);border-radius:var(--radius);padding:clamp(18px,3vw,28px)}
+.glance h2{font-size:1.05rem;color:var(--band-gold);margin-bottom:.9rem;font-family:var(--f-body);font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:.76rem}
+.glance dl{margin:0;display:grid;gap:0}
+.glance .row{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.4fr);gap:12px;padding:.8rem 0;border-top:1px solid var(--band-line)}
+.glance .row:first-of-type{border-top:0;padding-top:0}
+.glance dt{font-size:.8rem;color:var(--band-muted)}
+.glance dd{margin:0;font-weight:600;font-size:.95rem;overflow-wrap:anywhere}
+
+/* services */
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(28px,5vw,64px)}
+.head{display:grid;gap:.7rem;margin-bottom:clamp(28px,4vw,48px);max-width:68ch}
+.head h2{font-size:clamp(1.65rem,3.4vw,2.35rem)}
+.svc{border-top:3px solid var(--gold);padding-top:1.25rem;display:grid;gap:1rem;align-content:start}
+.svc h3{font-size:1.5rem}
+.svc ul{list-style:none;margin:.3rem 0 0;padding:0;display:grid;gap:.7rem}
+.svc li{display:grid;grid-template-columns:18px minmax(0,1fr);gap:10px;align-items:start}
+.svc li::before{content:"";width:8px;height:8px;margin-top:.6em;background:var(--gold);transform:rotate(45deg)}
+.svc li strong{font-weight:600}
+.note{font-size:.88rem;color:var(--muted)}
+
+/* tools */
+.tools{background:var(--surface-2)}
+.tools .grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:clamp(18px,3vw,32px);align-items:start}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:clamp(18px,3vw,30px);min-width:0}
+.panel h3{font-size:1.35rem;margin-bottom:.4rem}
+.field{display:grid;gap:.35rem;margin-top:1rem}
+.field label,.field .lab{font-size:.85rem;font-weight:600}
+.field input[type="number"],.field input[type="text"],.field select,.field textarea{width:100%;font:500 1rem/1.4 var(--f-body);padding:.7rem .8rem;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+.field textarea{min-height:92px;resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold)}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 16px}
+.range-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center}
+input[type="range"]{width:100%;accent-color:var(--gold)}
+.range-val{font-variant-numeric:tabular-nums;font-weight:600;min-width:5.5ch;text-align:right}
+.result{margin-top:1.5rem;padding-top:1.3rem;border-top:1px solid var(--line);display:grid;gap:.9rem}
+.bar{height:16px;border-radius:99px;overflow:hidden;background:color-mix(in srgb,var(--gap) 30%,transparent)}
+.bar i{display:block;height:100%;background:var(--bar);width:0;transition:width .35s ease}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.82rem;color:var(--muted)}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;background:var(--bar)}
+.legend span.g::before{background:var(--gap)}
+.figs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.fig small{display:block;font-size:.76rem;color:var(--muted);letter-spacing:.02em}
+.fig b{display:block;font:600 1.15rem/1.3 var(--f-display);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.fig.gapfig b{color:var(--gap)}
+.msg{font-weight:500}
+.checks{list-style:none;margin:1.1rem 0 0;padding:0;display:grid;gap:.4rem}
+.checks label{display:grid;grid-template-columns:24px minmax(0,1fr);gap:12px;align-items:start;padding:.65rem .7rem;border:1.5px solid var(--line);border-radius:8px;cursor:pointer;font-size:.95rem;line-height:1.5}
+.checks input{width:20px;height:20px;margin:.15rem 0 0;accent-color:var(--gold)}
+.checks label:has(input:checked){border-color:var(--gold);background:color-mix(in srgb,var(--gold) 12%,transparent)}
+.score{margin-top:1.1rem;font-weight:600}
+.score small{display:block;font-weight:400;color:var(--muted);margin-top:.2rem}
+
+/* process */
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(16px,2.5vw,28px);counter-reset:s}
+.steps li{counter-increment:s;border-top:1.5px solid var(--line);padding-top:1rem;display:grid;gap:.5rem;align-content:start}
+.steps li::before{content:"0" counter(s);font:600 1.6rem/1 var(--f-display);color:var(--gold-ink)}
+.steps h3{font-size:1.15rem}
+.steps p{font-size:.94rem;color:var(--muted)}
+
+/* about */
+.about{background:var(--navy);color:var(--band-fg)}
+.about .wrap{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.4fr);gap:clamp(24px,5vw,64px);align-items:start}
+.about .eyebrow{color:var(--band-gold)}
+.about h2{font-size:clamp(1.65rem,3.4vw,2.3rem);margin-top:.7rem}
+.about .body{display:grid;gap:1rem;color:var(--band-muted);font-size:1.04rem}
+.about .body strong{color:var(--band-fg);font-weight:600}
+.pillars{display:flex;flex-wrap:wrap;gap:10px;margin-top:.4rem}
+.pillars span{border:1px solid var(--band-line);border-radius:99px;padding:.35rem .9rem;font-size:.85rem;color:var(--band-fg)}
+
+/* serve */
+.serve .two .svc h3{font-size:1.3rem}
+
+/* faq */
+.faq{display:grid;gap:0;max-width:820px}
+.faq details{border-top:1px solid var(--line);padding:1rem 0}
+.faq details:last-child{border-bottom:1px solid var(--line)}
+.faq summary{cursor:pointer;font:600 1.08rem/1.4 var(--f-display);list-style:none;display:flex;justify-content:space-between;gap:16px;align-items:start}
+html[data-lang="zh"] .faq summary{font-weight:700}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";flex:none;font:500 1.5rem/1 var(--f-body);color:var(--gold-ink)}
+.faq details[open] summary::after{content:"\2212"}
+.faq details p{margin-top:.7rem;color:var(--muted);max-width:64ch}
+
+/* contact */
+.contact{background:var(--surface-2)}
+.contact .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(24px,5vw,64px);align-items:start}
+.channels{display:grid;gap:14px;margin-top:1.6rem}
+.chan{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:1rem 1.1rem;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius)}
+.chan small{display:block;font-size:.76rem;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.chan b{display:block;font:600 1.2rem/1.3 var(--f-display);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.chan .acts{display:flex;gap:8px;flex-wrap:wrap}
+.mini{appearance:none;font:600 .82rem/1 var(--f-body);padding:.65rem .85rem;border-radius:8px;border:1.5px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;text-decoration:none;min-height:40px;display:inline-flex;align-items:center}
+.mini:hover{border-color:var(--gold)}
+.send{display:flex;flex-wrap:wrap;gap:10px;margin-top:1.2rem;align-items:center}
+.status{font-size:.85rem;color:var(--muted);min-height:1.2em;margin-top:.6rem}
+
+/* footer */
+.foot{border-top:1px solid var(--line)}
+.foot .wrap{padding-block:34px;display:grid;gap:.9rem}
+.foot p{font-size:.8rem;color:var(--muted);max-width:92ch}
+.foot .copy{font-weight:600;color:var(--ink)}
+
+@media (max-width:860px){
+  .hero .wrap,.two,.tools .grid,.about .wrap,.contact .grid{grid-template-columns:minmax(0,1fr)}
+  .steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:520px){
+  .fields{grid-template-columns:minmax(0,1fr)}
+  .figs{grid-template-columns:minmax(0,1fr)}
+  .steps{grid-template-columns:minmax(0,1fr)}
+  .glance .row{grid-template-columns:minmax(0,1fr)}
+  .glance .row{gap:2px}
+  .chan{grid-template-columns:minmax(0,1fr)}
+  .top-actions{width:100%;justify-content:space-between}
+}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  .btn,.bar i{transition:none}
+}
+</style>
+
+<script>
+(function(){
+  var l='en';
+  try{var s=localStorage.getItem('hts-lang');if(s==='zh'||s==='en')l=s;}catch(e){}
+  document.documentElement.setAttribute('data-lang',l);
+  document.documentElement.setAttribute('lang',l==='zh'?'zh-Hans':'en');
+})();
+</script>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Hiew Tieng Shen">
+      <span class="mark" aria-hidden="true">HTS</span>
+      <span>
+        <span class="brand-name">Hiew Tieng Shen 丘廷升</span>
+        <span class="brand-sub"><span class="en">Income protection &amp; legacy planning</span><span class="zh">收入保障 · 资产传承规划</span></span>
+      </span>
+    </a>
+    <div class="top-actions">
+      <div class="lang" role="group" aria-label="Language / 语言">
+        <button type="button" data-set="en" aria-pressed="true">EN</button>
+        <button type="button" data-set="zh" aria-pressed="false">中文</button>
+      </div>
+      <a class="btn btn-ink" href="https://wa.me/60163388362" target="_blank" rel="noopener"><span class="en">WhatsApp me</span><span class="zh">WhatsApp 联系我</span></a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <p class="eyebrow"><span class="en">Life Insurance Advisor · Great Eastern Life · Malaysia</span><span class="zh">人寿保险顾问 · 大东方人寿 · 马来西亚</span></p>
+      <h1>
+        <span class="en">Protect the income your family depends on. Pass on what you have built.</span>
+        <span class="zh">守护家人依靠的收入，传承您辛苦建立的资产。</span>
+      </h1>
+      <p class="lede">
+        <span class="en">I am Hiew Tieng Shen, a Life Insurance Advisor with Great Eastern Life Assurance (Malaysia) Berhad. I help families and business owners plan for the risks that can stop an income, and for the steps that make sure assets reach the right people.</span>
+        <span class="zh">我是丘廷升（Hiew Tieng Shen），大东方人寿保险（马来西亚）有限公司的人寿保险顾问。我协助家庭与企业主规划：一旦收入中断该怎么办，以及如何让资产顺利交到对的人手上。</span>
+      </p>
+      <div class="hero-cta">
+        <a class="btn btn-gold" href="#calculator"><span class="en">Check my protection gap</span><span class="zh">测算我的保障缺口</span></a>
+        <a class="btn btn-line" href="#contact"><span class="en">Book a conversation</span><span class="zh">预约面谈</span></a>
+      </div>
+    </div>
+    <aside class="glance" aria-label="At a glance">
+      <h2><span class="en">At a glance</span><span class="zh">一览</span></h2>
+      <dl>
+        <div class="row"><dt><span class="en">Focus</span><span class="zh">专长</span></dt><dd><span class="en">Income protection, legacy planning, will writing and trusts</span><span class="zh">收入保障、传承规划、撰写遗嘱与设立信托</span></dd></div>
+        <div class="row"><dt><span class="en">Who I help</span><span class="zh">服务对象</span></dt><dd><span class="en">Individuals, families and business owners</span><span class="zh">个人、家庭与企业主</span></dd></div>
+        <div class="row"><dt><span class="en">Languages</span><span class="zh">语言</span></dt><dd>English · 中文</dd></div>
+        <div class="row"><dt>WhatsApp</dt><dd>016-338 8362</dd></div>
+        <div class="row"><dt>Instagram</dt><dd>@tieng_shen</dd></div>
+      </dl>
+    </aside>
+  </div>
+</section>
+
+<section class="pad" id="services">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow"><span class="en">What I plan with you</span><span class="zh">我与您一起规划的事项</span></p>
+      <h2><span class="en">One protects what you earn. The other protects what you leave.</span><span class="zh">一份守护您的收入，一份守护您留下的资产。</span></h2>
+    </div>
+    <div class="two">
+      <article class="svc">
+        <h3><span class="en">Income protection</span><span class="zh">收入保障</span></h3>
+        <p class="lede"><span class="en">If illness, disability or death stops your income, the bills do not stop. The aim is a plan that keeps your family's lifestyle, loans and children's education on track.</span><span class="zh">当疾病、残疾或身故令收入中断，开销并不会停。目标是让家人的生活、贷款和子女教育不受影响。</span></p>
+        <ul>
+          <li><span><strong><span class="en">Life cover</span><span class="zh">人寿保障</span></strong> <span class="en">that replaces income and clears loans.</span><span class="zh">替代收入并清还贷款。</span></span></li>
+          <li><span><strong><span class="en">Critical illness cover</span><span class="zh">严重疾病保障</span></strong> <span class="en">for treatment costs and months away from work.</span><span class="zh">应对治疗费用与停工期间的开销。</span></span></li>
+          <li><span><strong><span class="en">Disability cover</span><span class="zh">残疾保障</span></strong> <span class="en">when you can no longer earn as before.</span><span class="zh">当您无法像以前一样赚取收入。</span></span></li>
+          <li><span><strong><span class="en">Medical cover</span><span class="zh">医药保障</span></strong> <span class="en">so a hospital bill does not drain your savings.</span><span class="zh">避免一笔医药费耗尽积蓄。</span></span></li>
+        </ul>
+      </article>
+      <article class="svc">
+        <h3><span class="en">Asset and legacy planning</span><span class="zh">资产与传承规划</span></h3>
+        <p class="lede"><span class="en">Passing on wealth takes more than leaving it behind. I help you set aside a defined sum, name who receives it, and give your family cash when they need it.</span><span class="zh">传承不只是把财富留下。我协助您预留一笔明确的资金、指定受益人，并让家人在需要时有现金可用。</span></p>
+        <ul>
+          <li><span><strong><span class="en">Defined legacy sums</span><span class="zh">明确的传承金额</span></strong> <span class="en">for spouse, children or parents.</span><span class="zh">留给配偶、子女或父母。</span></span></li>
+          <li><span><strong><span class="en">Cash for debts and final expenses</span><span class="zh">债务与身后费用的现金</span></strong> <span class="en">so assets need not be sold in a hurry.</span><span class="zh">不必仓促变卖资产。</span></span></li>
+          <li><span><strong><span class="en">Nominations reviewed</span><span class="zh">检视受益人提名</span></strong> <span class="en">so proceeds go where you intend.</span><span class="zh">让保障金流向您希望的人。</span></span></li>
+          <li><span><strong><span class="en">Business continuity</span><span class="zh">企业传承与延续</span></strong> <span class="en">funding for key-person and partner risk.</span><span class="zh">应对关键人物与合伙人风险。</span></span></li>
+        </ul>
+        <p class="note"><span class="en">Wills and trusts are covered below. For hibah or complex family situations, a lawyer's advice is best, and I am happy to work alongside yours.</span><span class="zh">遗嘱与信托见下方。赠与（Hibah）或较复杂的家庭情况，建议咨询律师，我乐意与您的律师配合。</span></p>
+      </article>
+    </div>
+    <div class="two" style="margin-top:clamp(28px,5vw,56px)">
+      <article class="svc">
+        <h3><span class="en">Will writing</span><span class="zh">撰写遗嘱</span></h3>
+        <p class="lede"><span class="en">Without a will, your wishes may not be followed. I help you prepare one so your family knows what you intended.</span><span class="zh">没有遗嘱，您的心愿未必能被执行。我协助您准备遗嘱，让家人清楚您的意愿。</span></p>
+        <ul>
+          <li><span><strong><span class="en">Name who receives what</span><span class="zh">指定谁得到什么</span></strong> <span class="en">across your assets.</span><span class="zh">涵盖您的各项资产。</span></span></li>
+          <li><span><strong><span class="en">Appoint an executor</span><span class="zh">委任遗嘱执行人</span></strong> <span class="en">to carry out your wishes.</span><span class="zh">负责执行您的心愿。</span></span></li>
+          <li><span><strong><span class="en">Name a guardian</span><span class="zh">指定监护人</span></strong> <span class="en">for young children.</span><span class="zh">照顾年幼的孩子。</span></span></li>
+          <li><span><strong><span class="en">Review it</span><span class="zh">定期检视</span></strong> <span class="en">when your family or assets change.</span><span class="zh">家庭或资产有变动时更新。</span></span></li>
+        </ul>
+        <p class="note"><span class="en">Wills are prepared through KOHA. KOHA's own terms and fees apply.</span><span class="zh">遗嘱通过 KOHA 办理，适用 KOHA 本身的条款与收费。</span></p>
+      </article>
+      <article class="svc">
+        <h3><span class="en">Trust set-up</span><span class="zh">设立信托</span></h3>
+        <p class="lede"><span class="en">A trust lets you decide when and how your family receives assets, with a professional trustee to administer them.</span><span class="zh">信托让您决定家人何时、以何种方式获得资产，并由专业受托人负责管理。</span></p>
+        <ul>
+          <li><span><strong><span class="en">Control timing</span><span class="zh">掌握时间</span></strong> <span class="en">of when beneficiaries receive funds.</span><span class="zh">决定受益人何时获得资金。</span></span></li>
+          <li><span><strong><span class="en">Provide for dependants</span><span class="zh">照顾受养人</span></strong> <span class="en">who cannot yet manage money themselves.</span><span class="zh">例如尚不能自行理财的孩子。</span></span></li>
+          <li><span><strong><span class="en">Professional trustee</span><span class="zh">专业受托人</span></strong> <span class="en">to administer the assets.</span><span class="zh">负责管理资产。</span></span></li>
+        </ul>
+        <p class="note"><span class="en">Trusts are set up through trust partners, including Affin Hwang. Each provider's own terms and fees apply.</span><span class="zh">信托通过合作的信托机构办理，包括 Affin Hwang，适用各机构本身的条款与收费。</span></p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="pad tools" id="calculator">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow"><span class="en">Try it yourself</span><span class="zh">自己试试</span></p>
+      <h2><span class="en">How big is the gap if your income stopped?</span><span class="zh">如果收入中断，缺口有多大？</span></h2>
+      <p class="lede"><span class="en">The figures below are examples. Replace them with your own to see a rough estimate.</span><span class="zh">以下数字仅为示例，请换成您自己的数字，获得粗略估算。</span></p>
+    </div>
+    <div class="grid">
+      <div class="panel">
+        <h3><span class="en">Protection gap calculator</span><span class="zh">保障缺口计算器</span></h3>
+        <p class="note"><span class="en">Example values shown</span><span class="zh">目前显示的是示例数字</span></p>
+        <div class="fields">
+          <div class="field"><label for="c-income"><span class="en">Monthly income (RM)</span><span class="zh">每月收入（RM）</span></label><input id="c-income" type="number" inputmode="numeric" min="0" step="100" value="6000"></div>
+          <div class="field"><label for="c-debt"><span class="en">Loans outstanding (RM)</span><span class="zh">未还贷款（RM）</span></label><input id="c-debt" type="number" inputmode="numeric" min="0" step="1000" value="200000"></div>
+          <div class="field"><label for="c-cover"><span class="en">Existing life / TPD cover (RM)</span><span class="zh">现有人寿 / 完全永久伤残保额（RM）</span></label><input id="c-cover" type="number" inputmode="numeric" min="0" step="1000" value="300000"></div>
+          <div class="field"><label for="c-save"><span class="en">Savings and investments (RM)</span><span class="zh">储蓄与投资（RM）</span></label><input id="c-save" type="number" inputmode="numeric" min="0" step="1000" value="100000"></div>
+        </div>
+        <div class="field">
+          <label for="c-years"><span class="en">Years of income your family would need</span><span class="zh">家人需要多少年的收入支持</span></label>
+          <div class="range-row"><input id="c-years" type="range" min="1" max="30" step="1" value="10"><span class="range-val" id="c-years-out">10</span></div>
+        </div>
+        <div class="result" aria-live="polite">
+          <div class="bar" role="img" aria-label="Covered versus gap"><i id="r-bar"></i></div>
+          <div class="legend"><span><span class="en">Covered by cover and savings</span><span class="zh">已由保障与储蓄覆盖</span></span><span class="g"><span class="en">Gap</span><span class="zh">缺口</span></span></div>
+          <div class="figs">
+            <div class="fig"><small><span class="en">Estimated need</span><span class="zh">估算所需</span></small><b id="r-need">RM 0</b></div>
+            <div class="fig"><small><span class="en">Already in place</span><span class="zh">已有资源</span></small><b id="r-have">RM 0</b></div>
+            <div class="fig gapfig"><small><span class="en">Estimated gap</span><span class="zh">估算缺口</span></small><b id="r-gap">RM 0</b></div>
+          </div>
+          <p class="msg"><span class="en" id="r-msg-en"></span><span class="zh" id="r-msg-zh"></span></p>
+          <p class="note"><span class="en">Illustrative only: income × years + loans − existing cover − savings. A real plan also looks at inflation, children's education, and benefits you already have.</span><span class="zh">仅供参考：收入 × 年数 + 贷款 − 现有保额 − 储蓄。正式规划还会考虑通胀、子女教育及您已有的保障。</span></p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3><span class="en">Legacy readiness check</span><span class="zh">传承准备度检查</span></h3>
+        <p class="note"><span class="en">Tick what is already in place.</span><span class="zh">勾选您已经完成的项目。</span></p>
+        <ul class="checks">
+          <li><label><input type="checkbox" class="lg"><span><span class="en">My insurance nominations are up to date.</span><span class="zh">我的保险受益人提名已经更新。</span></span></label></li>
+          <li><label><input type="checkbox" class="lg"><span><span class="en">I have a valid, up-to-date will.</span><span class="zh">我已有有效且最新的遗嘱。</span></span></label></li>
+          <li><label><input type="checkbox" class="lg"><span><span class="en">My family could cover debts and funeral costs without selling assets.</span><span class="zh">家人无需变卖资产，也能处理债务与丧葬开销。</span></span></label></li>
+          <li><label><input type="checkbox" class="lg"><span><span class="en">Someone I trust knows where my policies and documents are.</span><span class="zh">我信任的人知道保单与文件放在哪里。</span></span></label></li>
+          <li><label><input type="checkbox" class="lg"><span><span class="en">If I own a business, there is a plan for what happens to it.</span><span class="zh">如果我有生意，已有接手或传承的安排。</span></span></label></li>
+        </ul>
+        <p class="score" aria-live="polite"><span id="lg-count">0</span> / 5 <span class="en">in place</span><span class="zh">项已完成</span>
+          <small><span class="en" id="lg-en"></span><span class="zh" id="lg-zh"></span></small>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pad" id="process">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow"><span class="en">How we work</span><span class="zh">合作方式</span></p>
+      <h2><span class="en">Four steps, in plain language.</span><span class="zh">四个步骤，用您听得懂的话讲清楚。</span></h2>
+    </div>
+    <ol class="steps">
+      <li><h3><span class="en">Conversation</span><span class="zh">面谈了解</span></h3><p><span class="en">We talk through your family, income, loans and what you want to protect.</span><span class="zh">了解您的家庭、收入、贷款，以及您想守护的人与事。</span></p></li>
+      <li><h3><span class="en">Gap review</span><span class="zh">缺口检视</span></h3><p><span class="en">I look at what you already have and show where the shortfall is, in numbers.</span><span class="zh">检视您现有的保障，用数字说明缺口在哪里。</span></p></li>
+      <li><h3><span class="en">Options</span><span class="zh">方案建议</span></h3><p><span class="en">I explain suitable Great Eastern plans, including costs and exclusions. You decide.</span><span class="zh">讲解适合的大东方方案，包括费用与不保事项，由您决定。</span></p></li>
+      <li><h3><span class="en">Yearly review</span><span class="zh">每年检视</span></h3><p><span class="en">Life changes. We revisit your cover when income, family or business changes.</span><span class="zh">生活会改变。收入、家庭或生意有变动时，我们重新检视保障。</span></p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="about" id="about">
+  <div class="wrap pad">
+    <div>
+      <p class="eyebrow"><span class="en">About me</span><span class="zh">关于我</span></p>
+      <h2><span class="en">Hiew Tieng Shen</span><span class="zh">丘廷升</span></h2>
+    </div>
+    <div class="body">
+      <p><span class="en">My work centres on two questions. If your income stopped, what would your family do? And when the time comes to pass things on, will they go the way you intend?</span><span class="zh">我的工作围绕两个问题：如果您的收入中断，家人该怎么办？当需要传承时，资产能否按您的心意交接？</span></p>
+      <p><span class="en"><strong>I explain in English or Chinese, show the numbers, and leave the decision with you.</strong> I represent Great Eastern Life Assurance (Malaysia) Berhad for insurance, and arrange will writing and trust set-up through partners.</span><span class="zh"><strong>我会用英文或中文解释，摆出数字，把决定权留给您。</strong>保险方面我代表大东方人寿保险（马来西亚）有限公司；遗嘱撰写与信托设立则通过合作伙伴办理。</span></p>
+      <div class="pillars">
+        <span><span class="en">Plain-language advice</span><span class="zh">通俗易懂的建议</span></span>
+        <span><span class="en">Bilingual service</span><span class="zh">双语服务</span></span>
+        <span><span class="en">Families and business owners</span><span class="zh">家庭与企业主</span></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pad serve" id="serve">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow"><span class="en">Who this is for</span><span class="zh">适合谁</span></p>
+      <h2><span class="en">Built around how you earn and who relies on you.</span><span class="zh">依据您的收入方式，以及依赖您的人来规划。</span></h2>
+    </div>
+    <div class="two">
+      <article class="svc">
+        <h3><span class="en">Individuals and families</span><span class="zh">个人与家庭</span></h3>
+        <p class="lede"><span class="en">Salaried parents, couples and single-income households who want the mortgage, education and daily costs covered if something happens to the earner.</span><span class="zh">上班族父母、夫妻与单薪家庭：当主要收入者出事，房贷、教育与日常开销仍有着落。</span></p>
+      </article>
+      <article class="svc">
+        <h3><span class="en">Business owners</span><span class="zh">企业主</span></h3>
+        <p class="lede"><span class="en">Owners whose income and wealth sit in the business. We look at protecting your own family, the company's loans, and what happens if a partner or key person is gone.</span><span class="zh">收入与财富都在生意里的企业主：保障家人、公司贷款，以及合伙人或关键人物离开后的局面。</span></p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="pad" id="faq" style="padding-top:0">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow"><span class="en">Common questions</span><span class="zh">常见问题</span></p>
+      <h2><span class="en">Before we speak.</span><span class="zh">面谈之前。</span></h2>
+    </div>
+    <div class="faq">
+      <details>
+        <summary><span class="en">How much cover do I need?</span><span class="zh">我需要多少保额？</span></summary>
+        <p><span class="en">It depends on your income, loans, dependants and what you already own. The calculator above gives a rough starting point. We refine it together in a conversation.</span><span class="zh">取决于您的收入、贷款、受养人，以及您已有的资产。上面的计算器可作粗略起点，我们面谈时再一起细化。</span></p>
+      </details>
+      <details>
+        <summary><span class="en">Is legacy planning only for wealthy families?</span><span class="zh">传承规划只适合富裕家庭吗？</span></summary>
+        <p><span class="en">No. Any family with a home, loans or dependants has something to pass on. Starting with a clear sum and clear nominations is often the most useful first step.</span><span class="zh">不是。只要有房子、贷款或受养人，就有需要传承的事。从明确的金额与受益人提名开始，往往是最实用的第一步。</span></p>
+      </details>
+      <details>
+        <summary><span class="en">Does insurance replace a will?</span><span class="zh">保险可以取代遗嘱吗？</span></summary>
+        <p><span class="en">No. Insurance can pay a defined sum to the people you name, but it does not cover your other assets. A will covers the rest, and I can arrange one for you through KOHA. For hibah or complex family situations, speak to a lawyer.</span><span class="zh">不可以。保险可以把一笔明确的金额交给您指定的人，但不涵盖您的其他资产。其余部分由遗嘱处理，我可以通过 KOHA 为您安排。赠与（Hibah）或较复杂的家庭情况，请咨询律师。</span></p>
+      </details>
+      <details>
+        <summary><span class="en">What should I prepare for the first conversation?</span><span class="zh">第一次面谈需要准备什么？</span></summary>
+        <p><span class="en">A rough idea of your income, loans and any policies you already hold. If you have policy documents, bring them. If not, we can start without them.</span><span class="zh">大概的收入、贷款，以及您现有的保单资料。有保单文件可以带来，没有也可以先开始。</span></p>
+      </details>
+      <details>
+        <summary><span class="en">Who prepares the will and the trust?</span><span class="zh">遗嘱和信托由谁办理？</span></summary>
+        <p><span class="en">Your will is prepared through KOHA, and your trust is set up through trust partners such as Affin Hwang. I guide you through the process and coordinate with them. These services are separate from Great Eastern insurance plans, and each provider's own terms and fees apply.</span><span class="zh">遗嘱通过 KOHA 办理，信托则通过 Affin Hwang 等合作信托机构设立。我会全程协助并与他们沟通。这些服务与大东方保险计划各自独立，适用各机构本身的条款与收费。</span></p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="pad contact" id="contact">
+  <div class="wrap grid">
+    <div>
+      <p class="eyebrow"><span class="en">Get in touch</span><span class="zh">联系我</span></p>
+      <h2 style="font-size:clamp(1.65rem,3.4vw,2.35rem);margin-top:.7rem"><span class="en">Start with a message.</span><span class="zh">先发一则讯息吧。</span></h2>
+      <p class="lede" style="margin-top:.9rem"><span class="en">WhatsApp is the quickest way to reach me. Tell me a little about your situation and I will reply to arrange a time.</span><span class="zh">WhatsApp 是联系我最快的方式。简单说说您的情况，我会回复并安排时间。</span></p>
+      <div class="channels">
+        <div class="chan">
+          <div><small>WhatsApp</small><b id="wa-num">016-338 8362</b></div>
+          <div class="acts">
+            <a class="mini" href="https://wa.me/60163388362" target="_blank" rel="noopener"><span class="en">Open</span><span class="zh">打开</span></a>
+            <button type="button" class="mini" data-copy="016-338 8362"><span class="en">Copy</span><span class="zh">复制</span></button>
+          </div>
+        </div>
+        <div class="chan">
+          <div><small>Instagram</small><b>@tieng_shen</b></div>
+          <div class="acts">
+            <a class="mini" href="https://www.instagram.com/tieng_shen/" target="_blank" rel="noopener"><span class="en">Open</span><span class="zh">打开</span></a>
+            <button type="button" class="mini" data-copy="@tieng_shen"><span class="en">Copy</span><span class="zh">复制</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <form class="panel" id="lead" novalidate>
+      <h3><span class="en">Prepare your WhatsApp message</span><span class="zh">准备您的 WhatsApp 讯息</span></h3>
+      <p class="note"><span class="en">This form does not send anything. It writes a message you can send to me on WhatsApp.</span><span class="zh">此表单不会发送任何内容，只会帮您写好一则可发给我的 WhatsApp 讯息。</span></p>
+      <div class="field"><label for="f-name"><span class="en">Your name</span><span class="zh">您的名字</span></label><input id="f-name" type="text" autocomplete="name"></div>
+      <div class="fields">
+        <div class="field"><label for="f-topic"><span class="en">I am interested in</span><span class="zh">我想了解</span></label>
+          <select id="f-topic">
+            <option value="both">Income protection and legacy / 收入保障与传承规划</option>
+            <option value="income">Income protection / 收入保障</option>
+            <option value="legacy">Asset &amp; legacy planning / 资产与传承规划</option>
+            <option value="will">Will writing / 撰写遗嘱</option>
+            <option value="trust">Trust set-up / 设立信托</option>
+            <option value="other">Other / 其他</option>
+            <option value="unsure">Not sure yet / 还不确定</option>
+          </select></div>
+        <div class="field"><label for="f-lang"><span class="en">Preferred language</span><span class="zh">偏好语言</span></label>
+          <select id="f-lang">
+            <option value="en">English</option>
+            <option value="zh">中文</option>
+          </select></div>
+      </div>
+      <div class="field"><label for="f-note"><span class="en">Anything else? (optional)</span><span class="zh">还有什么想说？（选填）</span></label><textarea id="f-note"></textarea></div>
+      <div class="send">
+        <a class="btn btn-gold" id="wa-send" href="https://wa.me/60163388362" target="_blank" rel="noopener"><span class="en">Open WhatsApp with this message</span><span class="zh">带着这则讯息打开 WhatsApp</span></a>
+        <button type="button" class="mini" id="msg-copy"><span class="en">Copy message</span><span class="zh">复制讯息</span></button>
+      </div>
+      <p class="status" id="msg-status" role="status"></p>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p class="copy">© 2026 Hiew Tieng Shen 丘廷升</p>
+    <p class="en">Hiew Tieng Shen is a Life Insurance Advisor with Great Eastern Life Assurance (Malaysia) Berhad. This is a personal website and is not the official website of Great Eastern. The content is general information, not advice for your particular situation. Benefits are subject to the terms, conditions and exclusions of each policy. Please read the product disclosure sheet and policy contract before you decide. Will writing and trust services are provided by independent third-party partners and are separate from Great Eastern insurance plans. Calculator and checklist results are illustrative only.</p>
+    <p class="zh">丘廷升（Hiew Tieng Shen）为大东方人寿保险（马来西亚）有限公司的人寿保险顾问。本网站为个人网站，并非大东方的官方网站。内容为一般资讯，并非针对您个人情况的建议。保障受各保单的条款、条件与不保事项约束。作出决定前，请阅读产品说明书与保单合约。遗嘱与信托服务由独立的第三方合作伙伴提供，与大东方保险计划各自独立。计算器与检查表的结果仅供参考。</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var root=document.documentElement;
+  var $=function(id){return document.getElementById(id)};
+
+  /* language */
+  function setLang(l){
+    root.setAttribute('data-lang',l);
+    root.setAttribute('lang',l==='zh'?'zh-Hans':'en');
+    document.querySelectorAll('.lang button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.set===l))});
+    try{localStorage.setItem('hts-lang',l)}catch(e){}
+    buildMsg();
+  }
+  document.querySelectorAll('.lang button').forEach(function(b){b.addEventListener('click',function(){setLang(b.dataset.set)})});
+
+  /* calculator */
+  function num(id){var v=parseFloat($(id).value);return isFinite(v)&&v>0?v:0}
+  function rm(n){return 'RM '+Math.round(n).toLocaleString('en-MY')}
+  function calc(){
+    var inc=num('c-income'),debt=num('c-debt'),cover=num('c-cover'),save=num('c-save'),yrs=num('c-years');
+    $('c-years-out').textContent=yrs+(root.getAttribute('data-lang')==='zh'?' 年':' yrs');
+    var need=inc*12*yrs+debt,have=cover+save,gap=Math.max(0,need-have);
+    var pct=need>0?Math.min(100,have/need*100):0;
+    $('r-bar').style.width=pct+'%';
+    $('r-need').textContent=rm(need);$('r-have').textContent=rm(have);$('r-gap').textContent=rm(gap);
+    var en,zh;
+    if(need===0){en='Enter your income to see an estimate.';zh='请输入收入以查看估算。'}
+    else if(gap===0){en='On these figures, your cover and savings meet the estimate. A review can still check the quality of that cover.';zh='按这些数字，您的保障与储蓄已达到估算。仍可检视现有保障是否合适。'}
+    else{en='Your family could be about '+rm(gap)+' short. That is '+Math.round(100-pct)+'% of the estimated need.';zh='家人可能面对约 '+rm(gap)+' 的缺口，占估算所需的 '+Math.round(100-pct)+'%。'}
+    $('r-msg-en').textContent=en;$('r-msg-zh').textContent=zh;
+  }
+  ['c-income','c-debt','c-cover','c-save','c-years'].forEach(function(id){$(id).addEventListener('input',calc)});
+  new MutationObserver(calc).observe(root,{attributes:true,attributeFilter:['data-lang']});
+
+  /* legacy checklist */
+  var lg=document.querySelectorAll('.lg');
+  function lgUpdate(){
+    var n=0;lg.forEach(function(c){if(c.checked)n++});
+    $('lg-count').textContent=n;
+    var en,zh;
+    if(n===5){en='Everything on this list is in place. A yearly review keeps it that way.';zh='清单上的项目都已完成。每年检视一次，才能保持完善。'}
+    else if(n>=3){en='A good start. The remaining items are worth a conversation.';zh='已有良好基础。其余项目值得谈一谈。'}
+    else{en='There is room to strengthen this. A conversation can map out the first steps.';zh='还有可加强的地方。面谈可以理出第一步。'}
+    $('lg-en').textContent=en;$('lg-zh').textContent=zh;
+  }
+  lg.forEach(function(c){c.addEventListener('change',lgUpdate)});
+
+  /* copy helper */
+  function copyText(text,done){
+    function fallback(){
+      var t=document.createElement('textarea');t.value=text;t.setAttribute('readonly','');
+      t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();
+      var ok=false;try{ok=document.execCommand('copy')}catch(e){}
+      document.body.removeChild(t);done(ok);
+    }
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){done(true)},fallback);
+    }else fallback();
+  }
+  document.querySelectorAll('[data-copy]').forEach(function(b){
+    b.addEventListener('click',function(){
+      var keep=b.innerHTML;
+      copyText(b.dataset.copy,function(ok){
+        b.textContent=ok?(root.getAttribute('data-lang')==='zh'?'已复制':'Copied'):(root.getAttribute('data-lang')==='zh'?'请手动复制':'Copy manually');
+        setTimeout(function(){b.innerHTML=keep},1600);
+      });
+    });
+  });
+
+  /* WhatsApp message builder (opens a link; nothing is sent from this page) */
+  var topics={
+    both:{en:'income protection and legacy planning',zh:'收入保障和资产传承规划'},
+    income:{en:'income protection',zh:'收入保障'},
+    legacy:{en:'asset and legacy planning',zh:'资产与传承规划'},
+    will:{en:'will writing',zh:'撰写遗嘱'},
+    trust:{en:'setting up a trust',zh:'设立信托'},
+    other:{en:'something else',zh:'其他事项'},
+    unsure:{en:'getting started with financial planning',zh:'如何开始做财务规划'}
+  };
+  var msgText='';
+  function buildMsg(){
+    var l=root.getAttribute('data-lang')==='zh'?'zh':'en';
+    var name=$('f-name').value.trim(),tp=topics[$('f-topic').value]||topics.both,pl=$('f-lang').value,note=$('f-note').value.trim();
+    var m;
+    if(l==='zh'){
+      m='您好 Tieng Shen，'+(name?'我是'+name+'，':'')+'我想了解'+tp.zh+'。偏好语言：'+(pl==='zh'?'中文':'英文')+'。'+(note?'\n'+note:'');
+    }else{
+      m='Hi Tieng Shen, '+(name?"I'm "+name+'. ':'')+"I'd like to know more about "+tp.en+'. Preferred language: '+(pl==='zh'?'Chinese':'English')+'.'+(note?'\n'+note:'');
+    }
+    msgText=m;
+    $('wa-send').setAttribute('href','https://wa.me/60163388362?text='+encodeURIComponent(m));
+  }
+  ['f-name','f-topic','f-lang','f-note'].forEach(function(id){$(id).addEventListener('input',buildMsg);$(id).addEventListener('change',buildMsg)});
+  $('lead').addEventListener('submit',function(e){e.preventDefault()});
+  $('msg-copy').addEventListener('click',function(){
+    buildMsg();
+    copyText(msgText,function(ok){
+      var zh=root.getAttribute('data-lang')==='zh';
+      $('msg-status').textContent=ok?(zh?'讯息已复制，可粘贴到 WhatsApp。':'Message copied. Paste it into WhatsApp.'):(zh?'无法自动复制，请使用上方按钮打开 WhatsApp。':'Could not copy automatically. Use the button to open WhatsApp instead.');
+    });
+  });
+
+  /* init */
+  setLang(root.getAttribute('data-lang')==='zh'?'zh':'en');
+  calc();lgUpdate();buildMsg();
+})();
+</script>
