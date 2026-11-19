@@ -287,8 +287,16 @@
   const dueCol = () => data.headers.find(h => /premium due date/i.test(h)) || data.headers.find(h => /due date/i.test(h));
   const today = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
 
+  const inForce = row => { const sc = statusCol(); return !sc || /^in\s*force/i.test(row[sc] || ''); };
+  const groupOf = s => norm(String(s || '').split('(')[0]) || '(blank)';
+  const matchStatus = r => {
+    if (!view.status) return true;
+    const sc = statusCol(); if (!sc) return true;
+    return view.status.startsWith('g:') ? groupOf(r[sc]).toLowerCase() === view.status.slice(2).toLowerCase() : r[sc] === view.status;
+  };
+
   function dueState(row) {
-    const c = dueCol(); if (!c) return '';
+    const c = dueCol(); if (!c || !inForce(row)) return '';
     const d = parseDate(row[c]); if (!d) return '';
     const diff = (d - today()) / 864e5;
     if (diff < 0) return 'overdue';
@@ -306,7 +314,7 @@
   function filtered() {
     const sc = statusCol(), q = view.q.toLowerCase();
     let rows = data.rows.filter(r =>
-      (!view.status || (sc && r[sc] === view.status)) &&
+      matchStatus(r) &&
       (!view.due || dueState(r) === view.due) &&
       (!q || data.headers.some(h => String(r[h]).toLowerCase().includes(q))));
     if (view.sort) {
@@ -341,23 +349,40 @@
     const over = data.rows.filter(r => dueState(r) === 'overdue').length;
     const premCols = data.headers.filter(h => /premium amount/i.test(h));
     let tiles = `<div class="tile"><div class="k">Policies shown</div><div class="v">${rows.length}<span style="font-size:13px;color:var(--muted)"> / ${data.rows.length}</span></div></div>`;
+    tiles += `<div class="tile"><div class="k">In force (shown)</div><div class="v" style="color:var(--ok)">${rows.filter(inForce).length}</div></div>`;
     for (const pc of premCols) {
-      const sum = rows.reduce((s, r) => s + (parseNum(r[pc]) || 0), 0);
-      tiles += `<div class="tile"><div class="k">Total ${esc(pc)} (shown)</div><div class="v">${fmtRM(sum)}</div></div>`;
+      const sum = rows.filter(inForce).reduce((s, r) => s + (parseNum(r[pc]) || 0), 0);
+      tiles += `<div class="tile"><div class="k">Total ${esc(pc)} · in force (shown)</div><div class="v">${fmtRM(sum)}</div></div>`;
     }
     if (dueCol()) {
-      tiles += `<div class="tile click ${view.due === 'soon' ? 'active' : ''}" data-due="soon"><div class="k">Premium due ≤ ${DUE_SOON_DAYS} days</div><div class="v" style="color:var(--warn)">${soon}</div></div>`;
-      tiles += `<div class="tile click ${view.due === 'overdue' ? 'active' : ''}" data-due="overdue"><div class="k">Due date passed</div><div class="v" style="color:var(--bad)">${over}</div></div>`;
+      tiles += `<div class="tile click ${view.due === 'soon' ? 'active' : ''}" data-due="soon"><div class="k">In force · premium due ≤ ${DUE_SOON_DAYS} days</div><div class="v" style="color:var(--warn)">${soon}</div></div>`;
+      tiles += `<div class="tile click ${view.due === 'overdue' ? 'active' : ''}" data-due="overdue"><div class="k">In force · due date passed</div><div class="v" style="color:var(--bad)">${over}</div></div>`;
     }
 
     // Status chips
     let chips = '';
     if (sc) {
-      const counts = {};
-      data.rows.forEach(r => { const s = r[sc] || '(blank)'; counts[s] = (counts[s] || 0) + 1; });
-      chips = `<span class="chip ${!view.status ? 'active' : ''}" data-status="">All statuses</span>` +
-        Object.entries(counts).sort((a, b) => b[1] - a[1])
-          .map(([s, n]) => `<span class="chip ${view.status === s ? 'active' : ''}" data-status="${esc(s)}">${esc(s)} · ${n}</span>`).join('');
+      const counts = {}, groups = {};
+      data.rows.forEach(r => {
+        const s = r[sc] || '(blank)', g = groupOf(s);
+        counts[s] = (counts[s] || 0) + 1;
+        (groups[g] = groups[g] || { n: 0, subs: new Set() }).n++; groups[g].subs.add(s);
+      });
+      const chip = (val, label, n) => `<span class="chip ${view.status === val ? 'active' : ''}" data-status="${esc(val)}">${esc(label)} · ${n}</span>`;
+      const order = ['inforce', 'waiting for validate', 'lapsed', 'terminated'];
+      const gs = Object.entries(groups).sort((a, b) => {
+        const ia = order.indexOf(a[0].toLowerCase()), ib = order.indexOf(b[0].toLowerCase());
+        return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib) || b[1].n - a[1].n;
+      });
+      chips = `<div class="chips"><span class="chip ${!view.status ? 'active' : ''}" data-status="">All statuses · ${data.rows.length}</span>` +
+        gs.map(([g, o]) => chip('g:' + g, g + ' (all)', o.n)).join('') + '</div>';
+      // Sub-statuses of the selected group (or of every group when a single status is picked)
+      const curGroup = view.status.startsWith('g:') ? view.status.slice(2).toLowerCase()
+                     : view.status ? groupOf(view.status).toLowerCase() : '';
+      if (curGroup) {
+        const subs = Object.entries(counts).filter(([s]) => groupOf(s).toLowerCase() === curGroup).sort((a, b) => b[1] - a[1]);
+        if (subs.length > 1) chips += '<div class="chips" style="margin-left:12px">' + subs.map(([s, n]) => chip(s, s, n)).join('') + '</div>';
+      }
     }
 
     // Column picker
@@ -374,7 +399,7 @@
 
     el.innerHTML = `
       <div class="tiles">${tiles}</div>
-      ${chips ? `<div class="chips">${chips}</div>` : ''}
+      ${chips}
       <div class="bar">
         <input type="search" id="q" placeholder="Search name, policy no, plan…" value="${esc(view.q)}" style="flex:1;min-width:200px">
         <details class="cols"><summary>Columns</summary><div>${picker}<p class="foot"><a href="#" id="colsReset">Reset to default</a></p></div></details>
