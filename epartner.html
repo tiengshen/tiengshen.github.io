@@ -612,10 +612,15 @@
           Submit: 'Submit',
         };
         let html = await get(form.action, { method: 'POST', form: body, referrer: FORM_PATH });
-        if (!/Stat\s*Code/i.test(html)) {
-          // Some ePartner pages hand off to a second page; follow it once.
-          const next = followUrl(html);
-          if (next) html = await get(next, { referrer: form.action });
+        // ePartner shows a "PROCESSING DATA" page first, which forwards to the
+        // real results page. Follow up to 4 hand-offs.
+        let here = form.action.split('?')[0];
+        for (let hop = 0; hop < 4 && !/Stat\s*Code/i.test(html); hop++) {
+          const step = nextStep(html, here);
+          if (!step) break;
+          flash(`Pulling ${view.label} (${i + 1} of ${picked.length}): waiting for DCMS to finish processing…`, 'info');
+          html = await get(step.path, { method: step.method, form: step.form, referrer: here });
+          here = step.path.split('?')[0];
         }
         let parsed;
         try { parsed = parseDcms(html); }
@@ -658,10 +663,59 @@
     return { defaults, action, views };
   }
 
-  function followUrl(html) {
-    const m = html.match(/http-equiv=["']?refresh["']?[^>]*url=([^"'>\s]+)/i) || html.match(/location(?:\.href)?\s*=\s*["']([^"']+)["']/i);
-    if (!m) return null;
-    try { const u = new URL(m[1], 'https://x' + POST_PATH); return u.pathname.startsWith('/ePartner3/') ? u.pathname + u.search : null; } catch { return null; }
+  // Work out where a hand-off page sends the browser next.
+  function resolveDcms(u, base) {
+    try {
+      const url = new URL(u, 'https://x' + base);
+      if (!url.pathname.startsWith('/ePartner3/') || /logout|logoff/i.test(url.pathname)) return null;
+      return url.pathname + url.search;
+    } catch { return null; }
+  }
+  function formFields(f) {
+    const out = {};
+    for (const el of f.querySelectorAll('input[name], select[name], textarea[name]')) {
+      const t = (el.getAttribute('type') || '').toLowerCase();
+      if (['button', 'image', 'reset', 'file'].includes(t)) continue;
+      if ((t === 'checkbox' || t === 'radio') && !el.hasAttribute('checked')) continue;
+      if (el.tagName === 'SELECT') {
+        const o = el.querySelector('option[selected]') || el.querySelector('option');
+        out[el.name] = o ? (o.getAttribute('value') ?? o.textContent.trim()) : '';
+      } else if (el.tagName === 'TEXTAREA') out[el.name] = el.textContent;
+      else out[el.name] = el.getAttribute('value') || '';
+    }
+    return out;
+  }
+  function nextStep(html, base) {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const js = ([...doc.scripts].map(x => x.textContent).join('\n') + '\n' +
+      [...doc.querySelectorAll('[onload]')].map(x => x.getAttribute('onload')).join('\n'))
+      .replace(/["']\s*\+\s*["']/g, '');               // join "/ePartner3"+"/web/..." pieces
+    const jsNoFns = js.replace(/function\s+confirmLogout[\s\S]*?\n\}/g, '');
+
+    // 1) A form that the page submits by itself
+    if (/\.submit\s*\(/.test(jsNoFns)) {
+      const forms = [...doc.forms];
+      const named = forms.find(f => {
+        const n = f.getAttribute('name') || f.getAttribute('id');
+        return n && new RegExp('(forms\\[\\s*["\']?' + n + '["\']?\\s*\\]|document\\.' + n + '|getElementById\\(\\s*["\']' + n + '["\']\\s*\\))[^;\\n]*\\.submit').test(jsNoFns);
+      });
+      const f = named || forms.find(f => !/processing\.jsp/i.test(f.getAttribute('action') || '')) || forms[0];
+      if (f) {
+        let action = f.getAttribute('action') || '';
+        const setAct = jsNoFns.match(/\.action\s*=\s*["']([^"']+)["']/);
+        if (setAct) action = setAct[1];
+        const path = resolveDcms(action || base, base);
+        if (path) return { path, method: (f.getAttribute('method') || 'GET').toUpperCase() === 'POST' ? 'POST' : 'GET', form: formFields(f) };
+      }
+    }
+    // 2) A script redirect to a fixed address
+    const loc = jsNoFns.match(/(?:location(?:\.href)?\s*=|location\.(?:replace|assign)\s*\(|window\.open\s*\()\s*["']([^"']+)["']/);
+    if (loc) { const path = resolveDcms(loc[1], base); if (path) return { path, method: 'GET' }; }
+    // 3) <meta http-equiv="refresh">
+    const meta = doc.querySelector('meta[http-equiv="refresh" i]');
+    const mu = meta && (meta.getAttribute('content') || '').match(/url\s*=\s*['"]?([^'";]+)/i);
+    if (mu) { const path = resolveDcms(mu[1], base); if (path) return { path, method: 'GET' }; }
+    return null;
   }
 
   // ---- Parse the results (plain-text report or table) ----
@@ -746,9 +800,18 @@
     const i = text.search(/Stat\s*Code/i);
     const snippet = (i >= 0 ? text.slice(Math.max(0, i - 300), i + 900) : text.slice(0, 1200))
       .replace(/\d{6}-\d{2}-\d{4}/g, '######-##-####').replace(/\n\s*\n+/g, '\n');
+    const mask = t => String(t).replace(/\d{6}-\d{2}-\d{4}/g, '######-##-####');
+    const forms = [...doc.forms].map(f => '  <form name=' + (f.getAttribute('name') || '') + ' action=' + (f.getAttribute('action') || '') +
+      ' method=' + (f.getAttribute('method') || '') + '> fields: ' + [...f.querySelectorAll('[name]')].map(e => e.getAttribute('name')).join(', ')).join('\n');
+    const scripts = [...doc.scripts].map(x => x.textContent.trim()).filter(t => t && !/confirmLogout|gtag|dataLayer|GoogleAnalytics/i.test(t))
+      .map(t => mask(t.slice(0, 700))).join('\n  ---\n');
+    const metas = [...doc.querySelectorAll('meta[http-equiv]')].map(m => m.outerHTML).join(' ');
+    const onload = [...doc.querySelectorAll('[onload]')].map(x => x.getAttribute('onload')).join(' | ');
+    const extra = '\n\nForms:\n' + (forms || '  (none)') + '\nonload: ' + (onload || '(none)') + '\nmeta: ' + (metas || '(none)') +
+      '\nScripts:\n  ' + (scripts || '(none)');
     const d = $('ddiag'); d.style.display = 'block';
     d.textContent = 'DCMS diagnostics (IC numbers masked)\nReason: ' + reason + '\nTitle: ' + norm(doc.title) +
-      ' · Tables: ' + doc.querySelectorAll('table').length + ' · <pre>: ' + doc.querySelectorAll('pre').length + '\n---\n' + snippet;
+      ' · Tables: ' + doc.querySelectorAll('table').length + ' · <pre>: ' + doc.querySelectorAll('pre').length + '\n---\n' + snippet.slice(-600) + extra;
   }
 
   function save() {
