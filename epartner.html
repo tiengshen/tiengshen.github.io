@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>My Policies</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #ffffff; --text: #1f2328; --muted: #656d76; --line: #e3e6ea;
+    --accent: #1a5fb4; --accent-text: #ffffff; --ok: #1a7f37; --warn: #9a6700; --bad: #cf222e;
+    --chip: #eef1f5; --row-hover: #f3f6fb;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f1216; --card: #171b21; --text: #e6e8eb; --muted: #9aa3ad; --line: #2a3038;
+      --accent: #4c8ee6; --accent-text: #0b1220; --ok: #4ac26b; --warn: #d29922; --bad: #f85149;
+      --chip: #222831; --row-hover: #1d232b;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1400px; margin: 0 auto; padding: 20px 16px 48px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 16px; }
+  .bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin-bottom: 12px; }
+  .bar label { color: var(--muted); font-size: 13px; }
+  input, select, button { font: inherit; color: var(--text); }
+  input[type=text], input[type=search], select { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; }
+  button { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; cursor: pointer; }
+  button:hover { border-color: var(--accent); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); font-weight: 600; }
+  button:disabled { opacity: .5; cursor: default; }
+  .spacer { flex: 1; }
+  #msg { padding: 10px 12px; border-radius: 10px; margin-bottom: 12px; display: none; }
+  #msg.show { display: block; }
+  #msg.info { background: var(--chip); }
+  #msg.ok { background: color-mix(in srgb, var(--ok) 15%, transparent); }
+  #msg.bad { background: color-mix(in srgb, var(--bad) 15%, transparent); }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-bottom: 12px; }
+  .tile { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+  .tile .k { color: var(--muted); font-size: 12px; }
+  .tile .v { font-size: 22px; font-weight: 650; font-variant-numeric: tabular-nums; }
+  .tile.click { cursor: pointer; }
+  .tile.click:hover, .tile.active { border-color: var(--accent); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .chip { background: var(--chip); border: 1px solid transparent; border-radius: 999px; padding: 4px 10px; font-size: 13px; cursor: pointer; }
+  .chip.active { border-color: var(--accent); color: var(--accent); }
+  .tablewrap { background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: auto; max-height: 70vh; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 10px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+  th { position: sticky; top: 0; background: var(--card); cursor: pointer; user-select: none; font-weight: 600; z-index: 1; }
+  th .arrow { color: var(--muted); font-size: 11px; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tr:hover td { background: var(--row-hover); }
+  .due-soon { color: var(--warn); font-weight: 600; }
+  .overdue { color: var(--bad); font-weight: 600; }
+  details.cols { position: relative; }
+  details.cols > div { position: absolute; z-index: 5; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px; max-height: 50vh; overflow: auto; min-width: 240px; box-shadow: 0 8px 24px rgba(0,0,0,.15); }
+  details.cols label { display: block; color: var(--text); padding: 2px 0; }
+  summary { cursor: pointer; list-style: none; border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; }
+  .empty { text-align: center; color: var(--muted); padding: 40px 16px; }
+  .foot { color: var(--muted); font-size: 12px; margin-top: 10px; }
+  #diag { white-space: pre-wrap; font: 12px/1.4 ui-monospace, monospace; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px; display: none; margin-top: 10px; }
+  @media (max-width: 600px) { .bar { flex-direction: column; align-items: stretch; } .spacer { display: none; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>My Policies</h1>
+  <p class="sub" id="sub">Pulled from ePartner by the ePartner Puller extension. Data stays in this browser only.</p>
+
+  <div class="bar">
+    <label for="agentNo">Agent no.</label>
+    <input type="text" id="agentNo" size="10" inputmode="numeric" autocomplete="off">
+    <button class="primary" id="btnUpdate">Update from ePartner</button>
+    <label for="keep">Keep data</label>
+    <select id="keep">
+      <option value="local">until I click Clear</option>
+      <option value="session">until I close this tab</option>
+    </select>
+    <span class="spacer"></span>
+    <label class="import"><button id="btnImport" type="button">Import saved page…</button><input type="file" id="file" accept=".html,.htm,text/html" hidden></label>
+    <button id="btnClear">Clear data</button>
+  </div>
+
+  <div id="msg"></div>
+  <div id="content"></div>
+  <div id="diag"></div>
+</main>
+
+<script>
+(() => {
+  // ---- Settings -----------------------------------------------------------
+  const EXT_ID = 'hejafgddnndcimepblniaffimbgmedgk';
+  const LIST_PATH = '/ePartner3_fpms/fpms/customerService/policyEnquiry.do';
+  const DATA_KEY = 'ep.policies.v1';
+  const DUE_SOON_DAYS = 30;
+  // Columns hidden by default (you can still switch them on under "Columns").
+  const DEFAULT_HIDDEN = [/gja/i, /issuing agent/i, /^column \d+$/i];
+
+  // ---- Safe storage -------------------------------------------------------
+  const store = {
+    get(area, k) { try { return window[area].getItem(k); } catch { return null; } },
+    set(area, k, v) { try { window[area].setItem(k, v); return true; } catch { return false; } },
+    del(area, k) { try { window[area].removeItem(k); } catch {} },
+  };
+  const $ = id => document.getElementById(id);
+
+  // ---- State --------------------------------------------------------------
+  let data = null;            // { fetchedAt, source, headers, rows: [{ _policyNo, ...cells }] }
+  let view = { q: '', status: '', due: '', sort: null, dir: 1, hidden: null };
+
+  $('agentNo').value = store.get('localStorage', 'ep.agentNo') || '';
+  $('keep').value = store.get('localStorage', 'ep.keep') || 'local';
+  try { view.hidden = JSON.parse(store.get('localStorage', 'ep.hiddenCols') || 'null'); } catch {}
+
+  loadSaved();
+  render();
+
+  // ---- UI events ----------------------------------------------------------
+  $('agentNo').addEventListener('change', e => store.set('localStorage', 'ep.agentNo', e.target.value.trim()));
+  $('keep').addEventListener('change', e => {
+    store.set('localStorage', 'ep.keep', e.target.value);
+    if (data) save();
+  });
+  $('btnUpdate').addEventListener('click', update);
+  $('btnClear').addEventListener('click', () => {
+    store.del('localStorage', DATA_KEY); store.del('sessionStorage', DATA_KEY);
+    data = null; render(); flash('Data cleared from this browser.', 'ok');
+  });
+  $('btnImport').addEventListener('click', () => $('file').click());
+  $('file').addEventListener('change', async e => {
+    const f = e.target.files[0]; e.target.value = '';
+    if (!f) return;
+    try { ingest(await f.text(), 'Imported file: ' + f.name); }
+    catch (err) { fail(err); }
+  });
+
+  // ---- Extension bridge ---------------------------------------------------
+  function ext(msg) {
+    return new Promise((resolve, reject) => {
+      if (!window.chrome || !chrome.runtime || !chrome.runtime.sendMessage) {
+        return reject(new Error('NO_EXTENSION'));
+      }
+      try {
+        chrome.runtime.sendMessage(EXT_ID, msg, res => {
+          const le = chrome.runtime.lastError;
+          if (le) return reject(new Error('NO_EXTENSION'));
+          resolve(res);
+        });
+      } catch { reject(new Error('NO_EXTENSION')); }
+    });
+  }
+
+  const ERR_TEXT = {
+    NO_EXTENSION: 'The ePartner Puller extension was not found. Use Chrome on the computer where it is installed, and check it is switched on in chrome://extensions.',
+    NO_TAB: 'Open ePartner in another tab and log in, then click Update again.',
+    LOGGED_OUT: 'Your ePartner session has expired. Log in to ePartner again, then click Update.',
+    NETWORK: 'Could not reach ePartner. Check your internet connection and that the ePartner tab is loaded.',
+  };
+
+  async function update() {
+    const agentNo = $('agentNo').value.trim();
+    if (!/^\d{4,12}$/.test(agentNo)) { flash('Enter your agent number first.', 'bad'); $('agentNo').focus(); return; }
+    store.set('localStorage', 'ep.agentNo', agentNo);
+    const btn = $('btnUpdate'); btn.disabled = true;
+    flash('Pulling your policy listing from ePartner…', 'info');
+    try {
+      const res = await ext({
+        type: 'fetch', path: LIST_PATH, method: 'POST',
+        form: { action: 'getPolicyEnquiry_Result', check: '0', optionSelection: 'All_policies', agentNo, submit: 'Submit' },
+      });
+      if (!res || !res.ok) throw new Error((res && res.error) || 'ERROR', { cause: res && res.detail });
+      ingest(res.html, 'ePartner');
+    } catch (err) { fail(err); }
+    finally { btn.disabled = false; }
+  }
+
+  function fail(err) {
+    const code = err && err.message;
+    let text = ERR_TEXT[code] || (code && code.startsWith('HTTP_') ? 'ePartner returned an error (' + code.slice(5) + '). Try again in a moment.' : (code || 'Something went wrong.'));
+    if (err && err.cause) text += ' (' + err.cause + ')';
+    flash(text, 'bad');
+  }
+
+  // ---- Parsing ------------------------------------------------------------
+  const norm = s => (s || '').replace(/\s+/g, ' ').trim();
+  const cellsOf = tr => [...tr.children].filter(c => c.tagName === 'TD' || c.tagName === 'TH');
+
+  function parsePolicyList(html) {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    let headerTr = null;
+    for (const tr of doc.querySelectorAll('tr')) {
+      const t = cellsOf(tr).map(c => norm(c.textContent).toLowerCase());
+      if (t.includes('status') && t.some(x => x.startsWith('commencement date'))) { headerTr = tr; break; }
+    }
+    if (!headerTr) throw new Error('PARSE: could not find the policy table (no header row with "Status" and "Commencement Date").');
+
+    // Header names, expanding colspans and de-duplicating.
+    const headers = [], seen = {};
+    for (const c of cellsOf(headerTr)) {
+      const span = Math.max(1, parseInt(c.getAttribute('colspan') || '1', 10));
+      for (let i = 0; i < span; i++) {
+        let name = norm(c.textContent) || 'Column ' + (headers.length + 1);
+        if (seen[name]) name = name + ' (' + (++seen[name]) + ')'; else seen[name] = 1;
+        headers.push(name);
+      }
+    }
+
+    const table = headerTr.closest('table');
+    const all = [...table.rows];
+    const rows = [];
+    for (const tr of all.slice(all.indexOf(headerTr) + 1)) {
+      const vals = [];
+      for (const c of cellsOf(tr)) {
+        const span = Math.max(1, parseInt(c.getAttribute('colspan') || '1', 10));
+        vals.push(norm(c.textContent)); for (let i = 1; i < span; i++) vals.push('');
+      }
+      if (vals.length < Math.ceil(headers.length * 0.6) || vals.every(v => !v)) continue;
+      const row = {};
+      headers.forEach((h, i) => { row[h] = vals[i] ?? ''; });
+      const hidden = tr.querySelector('input[name^="policyStr"]');
+      const m = (hidden && hidden.value.match(/\d{6,}/)) || norm(tr.textContent).match(/\b\d{8,12}\b/);
+      row._policyNo = m ? m[0] : '';
+      rows.push(row);
+    }
+    if (!rows.length) throw new Error('PARSE: found the table header but no policy rows.');
+
+    // Make sure there is a Policy No column up front.
+    const hasPolicyCol = headers.some(h => /policy\s*(no|number)/i.test(h));
+    if (!hasPolicyCol) { headers.unshift('Policy No'); rows.forEach(r => { r['Policy No'] = r._policyNo; }); }
+    return { headers, rows };
+  }
+
+  function ingest(html, source) {
+    let parsed;
+    try { parsed = parsePolicyList(html); }
+    catch (e) { showDiag(html, e.message); throw new Error('ePartner\'s page layout wasn\'t recognised. Details are shown at the bottom of this page.'); }
+    data = { fetchedAt: new Date().toISOString(), source, ...parsed };
+    save(); render();
+    flash('Loaded ' + data.rows.length + ' policies.', 'ok');
+  }
+
+  function showDiag(html, reason) {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const ths = [...doc.querySelectorAll('tr')].slice(0, 400)
+      .map(tr => cellsOf(tr).map(c => norm(c.textContent).slice(0, 25)).filter(Boolean).join(' | '))
+      .filter(s => /status|date|policy/i.test(s)).slice(0, 8);
+    const d = $('diag');
+    d.style.display = 'block';
+    d.textContent = 'Diagnostics (no client data shown)\nReason: ' + reason +
+      '\nPage title: ' + norm(doc.title) + '\nTables: ' + doc.querySelectorAll('table').length +
+      ' · Rows: ' + doc.querySelectorAll('tr').length +
+      '\nHeader-like rows:\n  ' + (ths.join('\n  ').replace(/\b\d{6,}\b/g, '#####') || '(none)');
+  }
+
+  // ---- Persistence --------------------------------------------------------
+  function save() {
+    const area = $('keep').value === 'session' ? 'sessionStorage' : 'localStorage';
+    const other = area === 'localStorage' ? 'sessionStorage' : 'localStorage';
+    store.del(other, DATA_KEY);
+    if (!store.set(area, DATA_KEY, JSON.stringify(data))) flash('Loaded, but this browser would not save it; it will be gone when you leave the page.', 'info');
+  }
+  function loadSaved() {
+    const raw = store.get('sessionStorage', DATA_KEY) || store.get('localStorage', DATA_KEY);
+    if (!raw) return;
+    try { data = JSON.parse(raw); } catch { data = null; }
+  }
+
+  // ---- Value helpers ------------------------------------------------------
+  const MONTHS = { jan:0, feb:1, mar:2, apr:3, may:4, jun:5, jul:6, aug:7, sep:8, oct:9, nov:10, dec:11 };
+  function parseDate(s) {
+    s = norm(s); let m;
+    if ((m = s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/))) return new Date(+m[3], +m[2] - 1, +m[1]);
+    if ((m = s.match(/^(\d{1,2})[\s\-\/]([A-Za-z]{3})[A-Za-z]*[\s\-\/,]+(\d{4})$/)) && MONTHS[m[2].toLowerCase()] !== undefined) return new Date(+m[3], MONTHS[m[2].toLowerCase()], +m[1]);
+    if ((m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/))) return new Date(+m[1], +m[2] - 1, +m[3]);
+    return null;
+  }
+  function parseNum(s) {
+    const t = norm(s).replace(/^(rm|myr)\s*/i, '').replace(/,/g, '');
+    return /^-?\d+(\.\d+)?$/.test(t) ? parseFloat(t) : null;
+  }
+  const isDateCol = h => /date/i.test(h);
+  const isNumCol = h => /amount|premium|sum|value|\(rm\)/i.test(h) && !/date|mode|method|type/i.test(h);
+  const statusCol = () => data.headers.find(h => /^status$/i.test(h));
+  const dueCol = () => data.headers.find(h => /premium due date/i.test(h)) || data.headers.find(h => /due date/i.test(h));
+  const today = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
+
+  function dueState(row) {
+    const c = dueCol(); if (!c) return '';
+    const d = parseDate(row[c]); if (!d) return '';
+    const diff = (d - today()) / 864e5;
+    if (diff < 0) return 'overdue';
+    if (diff <= DUE_SOON_DAYS) return 'soon';
+    return '';
+  }
+
+  function hiddenCols() {
+    if (Array.isArray(view.hidden)) return new Set(view.hidden);
+    const h = new Set(data.headers.filter(x => DEFAULT_HIDDEN.some(re => re.test(x))));
+    data.headers.forEach(x => { if (data.rows.every(r => !r[x])) h.add(x); });
+    return h;
+  }
+
+  function filtered() {
+    const sc = statusCol(), q = view.q.toLowerCase();
+    let rows = data.rows.filter(r =>
+      (!view.status || (sc && r[sc] === view.status)) &&
+      (!view.due || dueState(r) === view.due) &&
+      (!q || data.headers.some(h => String(r[h]).toLowerCase().includes(q))));
+    if (view.sort) {
+      const h = view.sort, dir = view.dir;
+      const key = isDateCol(h) ? r => (parseDate(r[h]) || new Date(0)).getTime()
+                : isNumCol(h) ? r => parseNum(r[h]) ?? -Infinity
+                : r => String(r[h]).toLowerCase();
+      rows = [...rows].sort((a, b) => { const x = key(a), y = key(b); return (x < y ? -1 : x > y ? 1 : 0) * dir; });
+    }
+    return rows;
+  }
+
+  const fmtRM = n => 'RM ' + n.toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  // ---- Rendering ----------------------------------------------------------
+  function render() {
+    const el = $('content');
+    if (!data) {
+      $('sub').textContent = 'Pulled from ePartner by the ePartner Puller extension. Data stays in this browser only.';
+      el.innerHTML = '<div class="tablewrap"><div class="empty">No data yet.<br>Log in to ePartner in another tab, enter your agent number above, then click <b>Update from ePartner</b>.</div></div>';
+      return;
+    }
+    const when = new Date(data.fetchedAt);
+    $('sub').textContent = 'Last updated ' + when.toLocaleString() + ' · ' + data.rows.length + ' policies · stored in this browser only';
+
+    const rows = filtered(), sc = statusCol(), hid = hiddenCols();
+    const cols = data.headers.filter(h => !hid.has(h));
+
+    // Tiles
+    const soon = data.rows.filter(r => dueState(r) === 'soon').length;
+    const over = data.rows.filter(r => dueState(r) === 'overdue').length;
+    const premCols = data.headers.filter(h => /premium amount/i.test(h));
+    let tiles = `<div class="tile"><div class="k">Policies shown</div><div class="v">${rows.length}<span style="font-size:13px;color:var(--muted)"> / ${data.rows.length}</span></div></div>`;
+    for (const pc of premCols) {
+      const sum = rows.reduce((s, r) => s + (parseNum(r[pc]) || 0), 0);
+      tiles += `<div class="tile"><div class="k">Total ${esc(pc)} (shown)</div><div class="v">${fmtRM(sum)}</div></div>`;
+    }
+    if (dueCol()) {
+      tiles += `<div class="tile click ${view.due === 'soon' ? 'active' : ''}" data-due="soon"><div class="k">Premium due ≤ ${DUE_SOON_DAYS} days</div><div class="v" style="color:var(--warn)">${soon}</div></div>`;
+      tiles += `<div class="tile click ${view.due === 'overdue' ? 'active' : ''}" data-due="overdue"><div class="k">Due date passed</div><div class="v" style="color:var(--bad)">${over}</div></div>`;
+    }
+
+    // Status chips
+    let chips = '';
+    if (sc) {
+      const counts = {};
+      data.rows.forEach(r => { const s = r[sc] || '(blank)'; counts[s] = (counts[s] || 0) + 1; });
+      chips = `<span class="chip ${!view.status ? 'active' : ''}" data-status="">All statuses</span>` +
+        Object.entries(counts).sort((a, b) => b[1] - a[1])
+          .map(([s, n]) => `<span class="chip ${view.status === s ? 'active' : ''}" data-status="${esc(s)}">${esc(s)} · ${n}</span>`).join('');
+    }
+
+    // Column picker
+    const picker = data.headers.map(h => `<label><input type="checkbox" data-col="${esc(h)}" ${hid.has(h) ? '' : 'checked'}> ${esc(h)}</label>`).join('');
+
+    const thead = cols.map(h => `<th data-sort="${esc(h)}">${esc(h)} <span class="arrow">${view.sort === h ? (view.dir > 0 ? '▲' : '▼') : ''}</span></th>`).join('');
+    const tbody = rows.map(r => {
+      const ds = dueState(r);
+      return '<tr>' + cols.map(h => {
+        const cls = [isNumCol(h) && parseNum(r[h]) !== null ? 'num' : '', h === dueCol() && ds ? (ds === 'soon' ? 'due-soon' : 'overdue') : ''].filter(Boolean).join(' ');
+        return `<td${cls ? ` class="${cls}"` : ''}>${esc(r[h])}</td>`;
+      }).join('') + '</tr>';
+    }).join('');
+
+    el.innerHTML = `
+      <div class="tiles">${tiles}</div>
+      ${chips ? `<div class="chips">${chips}</div>` : ''}
+      <div class="bar">
+        <input type="search" id="q" placeholder="Search name, policy no, plan…" value="${esc(view.q)}" style="flex:1;min-width:200px">
+        <details class="cols"><summary>Columns</summary><div>${picker}<p class="foot"><a href="#" id="colsReset">Reset to default</a></p></div></details>
+        <button id="btnCsv">Export CSV</button>
+      </div>
+      <div class="tablewrap"><table><thead><tr>${thead}</tr></thead><tbody>${tbody || `<tr><td colspan="${cols.length}" class="empty">No policies match.</td></tr>`}</tbody></table></div>
+      <p class="foot">Click a column header to sort. Source: ${esc(data.source)}.</p>`;
+
+    // Wire up
+    el.querySelectorAll('[data-due]').forEach(t => t.onclick = () => { view.due = view.due === t.dataset.due ? '' : t.dataset.due; render(); });
+    el.querySelectorAll('[data-status]').forEach(c => c.onclick = () => { view.status = c.dataset.status; render(); });
+    el.querySelectorAll('th[data-sort]').forEach(th => th.onclick = () => {
+      const h = th.dataset.sort; view.dir = view.sort === h ? -view.dir : 1; view.sort = h; render();
+    });
+    const q = $('q');
+    q.oninput = () => { view.q = q.value; const pos = q.selectionStart; render(); const n = $('q'); n.focus(); n.setSelectionRange(pos, pos); };
+    el.querySelectorAll('[data-col]').forEach(cb => cb.onchange = () => {
+      const set = hiddenCols(); cb.checked ? set.delete(cb.dataset.col) : set.add(cb.dataset.col);
+      view.hidden = [...set]; store.set('localStorage', 'ep.hiddenCols', JSON.stringify(view.hidden));
+      render(); el.querySelector('details.cols').open = true;
+    });
+    $('colsReset').onclick = e => { e.preventDefault(); view.hidden = null; store.del('localStorage', 'ep.hiddenCols'); render(); };
+    $('btnCsv').onclick = () => exportCsv(rows, cols);
+  }
+
+  function exportCsv(rows, cols) {
+    const cell = v => /[",\n]/.test(v) ? '"' + String(v).replace(/"/g, '""') + '"' : String(v ?? '');
+    const csv = [cols.map(cell).join(','), ...rows.map(r => cols.map(h => cell(r[h])).join(','))].join('\r\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv' }));
+    a.download = 'policies-' + new Date().toISOString().slice(0, 10) + '.csv';
+    a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
+
+  function flash(text, kind) {
+    const m = $('msg'); m.textContent = text; m.className = 'show ' + kind;
+  }
+})();
+</script>
+</body>
+</html>
