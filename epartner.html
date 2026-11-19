@@ -115,9 +115,6 @@
   $('keep').value = store.get('localStorage', 'ep.keep') || 'local';
   try { view.hidden = JSON.parse(store.get('localStorage', 'ep.hiddenCols') || 'null'); } catch {}
 
-  loadSaved();
-  render();
-
   // ---- UI events ----------------------------------------------------------
   $('agentNo').addEventListener('change', e => store.set('localStorage', 'ep.agentNo', e.target.value.trim()));
   $('keep').addEventListener('change', e => {
@@ -436,6 +433,16 @@
 
   function flash(text, kind) {
     const m = $('msg'); m.textContent = text; m.className = 'show ' + kind;
+  }
+
+  // ---- Start (must stay at the very end, after everything above is defined)
+  loadSaved();
+  try { render(); }
+  catch (e) {
+    console.error(e);
+    flash('Your saved data could not be shown, so it was cleared. Click Update to pull it again.', 'bad');
+    store.del('localStorage', DATA_KEY); store.del('sessionStorage', DATA_KEY);
+    data = null; render();
   }
 })();
 </script>
